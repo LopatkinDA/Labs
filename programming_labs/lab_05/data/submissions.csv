@@ -1,0 +1,4 @@
+student_id,laboratory_id,score,comment,status
+s001,lab_01,87.5,Первая попытка,submitted
+s001,lab_01,95,Исправленная работа,accepted
+s002,lab_01,75,Работа принята,accepted

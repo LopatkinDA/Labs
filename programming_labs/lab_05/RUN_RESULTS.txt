@@ -1,0 +1,176 @@
+Проверка 24 ноября 2026 года
+3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]
+
+.......................                                                  [100%]
+23 passed in 0.08s
+
+Интеграционные проверки
+{
+  "atomic_failure": "Старый файл сохранен; временный удален",
+  "csv_students": {
+    "accepted": 2,
+    "rejected": 1,
+    "errors": [
+      "Строка 3: Идентификатор не может быть пустым"
+    ]
+  },
+  "csv_submissions": {
+    "accepted": 2,
+    "rejected": 2,
+    "errors": [
+      "Строка 3: Балл выходит за допустимый диапазон",
+      "Строка 4: Неверный статус"
+    ]
+  },
+  "commands": [
+    {
+      "command": "help",
+      "result": "help | exit | save\nstudent add ID \"Имя Фамилия\" Группа\nstudent list [name|group|id] | student show ID\nstudent activate ID | student deactivate ID | student search текст\nlab add ID \"Название\" максимум ГГГГ-ММ-ДД теги[,теги] [\"Описание\"]\nlab list | lab show ID | lab search текст\nsubmit студент работа балл [\"Комментарий\"]\nsubmission accept студент работа номер\nsubmission reject студент работа номер [\"Причина\"]\nhistory студент\nreport student ID | report group | report lab ID | report missing\ntop [число]\nimport students путь.csv | import submissions путь.csv\nexport json путь.json | export csv путь.csv\nsnapshot create | snapshot restore | undo\nmemory | memory profile\nПример: student add s001 \"Анна Смирнова\" P3120"
+    },
+    {
+      "command": "student add s001 \"Анна Смирнова\" P3120",
+      "result": "Студент добавлен."
+    },
+    {
+      "command": "student add s002 \"Борис Иванов\" P3121",
+      "result": "Студент добавлен."
+    },
+    {
+      "command": "lab add lab_01 \"Базовые типы\" 100 2026-12-01 python,types \"Основы Python\"",
+      "result": "Лабораторная добавлена."
+    },
+    {
+      "command": "lab add lab_02 \"Память\" 100 2026-12-02 memory",
+      "result": "Лабораторная добавлена."
+    },
+    {
+      "command": "student list",
+      "result": "[Student(student_id='s001', full_name='Анна Смирнова', group='P3120', registered_at='2026-11-24', active=True), Student(student_id='s002', full_name='Борис Иванов', group='P3121', registered_at='2026-11-24', active=True)]"
+    },
+    {
+      "command": "student list group",
+      "result": "[Student(student_id='s001', full_name='Анна Смирнова', group='P3120', registered_at='2026-11-24', active=True), Student(student_id='s002', full_name='Борис Иванов', group='P3121', registered_at='2026-11-24', active=True)]"
+    },
+    {
+      "command": "student list id",
+      "result": "[Student(student_id='s001', full_name='Анна Смирнова', group='P3120', registered_at='2026-11-24', active=True), Student(student_id='s002', full_name='Борис Иванов', group='P3121', registered_at='2026-11-24', active=True)]"
+    },
+    {
+      "command": "student show s001",
+      "result": "Student(student_id='s001', full_name='Анна Смирнова', group='P3120', registered_at='2026-11-24', active=True)"
+    },
+    {
+      "command": "student search СМИР",
+      "result": "[Student(student_id='s001', full_name='Анна Смирнова', group='P3120', registered_at='2026-11-24', active=True)]"
+    },
+    {
+      "command": "lab list",
+      "result": "[Laboratory(laboratory_id='lab_01', title='Базовые типы', max_score=100.0, deadline='2026-12-01', tags={'types', 'python'}, description='Основы Python'), Laboratory(laboratory_id='lab_02', title='Память', max_score=100.0, deadline='2026-12-02', tags={'memory'}, description='')]"
+    },
+    {
+      "command": "lab show lab_01",
+      "result": "Laboratory(laboratory_id='lab_01', title='Базовые типы', max_score=100.0, deadline='2026-12-01', tags={'types', 'python'}, description='Основы Python')"
+    },
+    {
+      "command": "lab search основы",
+      "result": "[Laboratory(laboratory_id='lab_01', title='Базовые типы', max_score=100.0, deadline='2026-12-01', tags={'types', 'python'}, description='Основы Python')]"
+    },
+    {
+      "command": "submit s001 lab_01 70 \"Первая попытка\"",
+      "result": "Submission(student_id='s001', laboratory_id='lab_01', attempt=1, score=70.0, comment='Первая попытка', status='submitted', submitted_at='2026-11-24T09:51:16.309532', max_score=100.0)"
+    },
+    {
+      "command": "submit s001 lab_01 90 \"Исправлено\"",
+      "result": "Submission(student_id='s001', laboratory_id='lab_01', attempt=2, score=90.0, comment='Исправлено', status='submitted', submitted_at='2026-11-24T09:51:16.310566', max_score=100.0)"
+    },
+    {
+      "command": "submission accept s001 lab_01 2",
+      "result": "Статус попытки изменен."
+    },
+    {
+      "command": "submission reject s001 lab_01 1 \"Нужно исправить\"",
+      "result": "Статус попытки изменен."
+    },
+    {
+      "command": "history s001",
+      "result": "[Submission(student_id='s001', laboratory_id='lab_01', attempt=1, score=70.0, comment='Нужно исправить', status='rejected', submitted_at='2026-11-24T09:51:16.309532', max_score=100.0), Submission(student_id='s001', laboratory_id='lab_01', attempt=2, score=90.0, comment='Исправлено', status='accepted', submitted_at='2026-11-24T09:51:16.310566', max_score=100.0)]"
+    },
+    {
+      "command": "report student s001",
+      "result": "{'student_id': 's001', 'name': 'Анна Смирнова', 'attempts': 2, 'best': 90.0, 'mean': 80.0, 'completed': 1, 'total_labs': 2, 'missing': ['lab_02'], 'best_by_lab': {'lab_01': 90.0}, 'rating_score': 45.0}"
+    },
+    {
+      "command": "report group",
+      "result": "{'students': 2, 'attempts': 2, 'mean': 80.0, 'best': 90.0, 'categories': {'0-59': 2, '60-74': 0, '75-89': 0, '90-100': 0, 'нет работ': 0}, 'leaders': ['s001'], 'rating': [{'student_id': 's001', 'name': 'Анна Смирнова', 'attempts': 2, 'best': 90.0, 'mean': 80.0, 'completed': 1, 'total_labs': 2, 'missing': ['lab_02'], 'best_by_lab': {'lab_01': 90.0}, 'rating_score': 45.0}, {'student_id': 's002', 'name': 'Борис Иванов', 'attempts': 0, 'best': None, 'mean': None, 'completed': 0, 'total_labs': 2, 'missing': ['lab_01', 'lab_02'], 'best_by_lab': {}, 'rating_score': 0.0}]}"
+    },
+    {
+      "command": "report lab lab_01",
+      "result": "{'laboratory_id': 'lab_01', 'attempts': 2, 'best': 90.0, 'mean': 80.0, 'accepted_students': 1}"
+    },
+    {
+      "command": "report missing",
+      "result": "{'s001': ['lab_02'], 's002': ['lab_01', 'lab_02']}"
+    },
+    {
+      "command": "top 5",
+      "result": "[{'student_id': 's001', 'name': 'Анна Смирнова', 'attempts': 2, 'best': 90.0, 'mean': 80.0, 'completed': 1, 'total_labs': 2, 'missing': ['lab_02'], 'best_by_lab': {'lab_01': 90.0}, 'rating_score': 45.0}, {'student_id': 's002', 'name': 'Борис Иванов', 'attempts': 0, 'best': None, 'mean': None, 'completed': 0, 'total_labs': 2, 'missing': ['lab_01', 'lab_02'], 'best_by_lab': {}, 'rating_score': 0.0}]"
+    },
+    {
+      "command": "snapshot create",
+      "result": "Команда снимка выполнена."
+    },
+    {
+      "command": "student deactivate s001",
+      "result": "Статус студента изменен."
+    },
+    {
+      "command": "snapshot restore",
+      "result": "Команда снимка выполнена."
+    },
+    {
+      "command": "student deactivate s002",
+      "result": "Статус студента изменен."
+    },
+    {
+      "command": "undo",
+      "result": "Последнее изменение отменено."
+    },
+    {
+      "command": "memory",
+      "result": "{'students': 2, 'laboratories': 2, 'submissions': 2, 'students_bytes': 184, 'laboratories_bytes': 184, 'submissions_bytes': 88, 'current_bytes': 65607, 'peak_bytes': 69253}"
+    },
+    {
+      "command": "memory profile",
+      "result": "[{'mode': 'list', 'rows': 2, 'peak_bytes': 1896}, {'mode': 'generator', 'rows': 2, 'peak_bytes': 1712}]"
+    },
+    {
+      "command": "export json \"<temp>/export.json\"",
+      "result": "Экспорт выполнен."
+    },
+    {
+      "command": "export csv \"<temp>/export.csv\"",
+      "result": "Экспорт выполнен."
+    },
+    {
+      "command": "save",
+      "result": "Данные сохранены."
+    }
+  ],
+  "cli_command_count": 33,
+  "cli_process": "CourseTracker 1.0\nВведите help для просмотра команд.\ncourse-tracker> Студент добавлен.\ncourse-tracker> Ошибка: Неизвестная команда. Введите help.\ncourse-tracker> Данные сохранены.\ncourse-tracker> Данные сохранены.\n",
+  "corrupt_json": "Не удалось загрузить файл: Expecting property name enclosed in double quotes: line 1 column 2 (char 1)\nЗапуск остановлен, чтобы не затереть поврежденный файл.\n",
+  "defect_shallow_snapshot": "copy сохранил общий список: [70, 90]; state/deepcopy изолирует снимок",
+  "defect_progress": "Наличие попытки не равно сдаче; учитывается только accepted",
+  "profile_300_students": [
+    {
+      "mode": "list",
+      "rows": 300,
+      "peak_bytes": 176072
+    },
+    {
+      "mode": "generator",
+      "rows": 300,
+      "peak_bytes": 1752
+    }
+  ]
+}

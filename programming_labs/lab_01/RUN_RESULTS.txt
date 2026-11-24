@@ -1,0 +1,178 @@
+Проверка 24 ноября 2026 года
+3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]
+
+lab_01/task_1.py
+Код завершения: 0
+14
+Python: 8 часов
+
+
+lab_01/task_2.py
+Код завершения: 0
+Типы: <class 'int'> <class 'int'> <class 'int'>
+Идентификаторы: 2976294738224 2976294738224 2976298353584
+a == b: True
+a is b: True
+a == c: True
+a is c: False
+c is None: True
+True
+True
+
+
+lab_01/task_3.py
+Код завершения: 0
++ 22 <class 'int'>
+- 12 <class 'int'>
+* 85 <class 'int'>
+/ 3.4 <class 'float'>
+// 3 <class 'int'>
+% 2 <class 'int'>
+** 1419857 <class 'int'>
+Большое целое: 10715086071862673209484250490600018105614048117055336074437503883703510511249361224931983788156958581275946729175531468251871452856923140435984577574698574803934567774824230985421074605062371141877954182153046474983581941267398767559165543946077062914571196477686542167660429831652624386837205668069376
+0.1 + 0.2: 0.30000000000000004
+== 0.3: False
+Разность: 5.551115123125783e-17
+isclose: True
+42 <class 'int'>
+3.14 <class 'float'>
+2026 <class 'str'>
+False <class 'bool'>
+True <class 'bool'>
+False <class 'bool'>
+True <class 'bool'>
+(2-3j) <class 'complex'>
+Действительная часть: 2.0
+Мнимая часть: -3.0
+int(42.9): 42
+
+
+lab_01/task_4.py
+Код завершения: 0
+Первый символ: А
+Последний символ: а
+Имя: Анна
+Фамилия: Смирнова
+АННА СМИРНОВА
+анна смирнова
+Инициалы: А.С.
+Курс наоборот: nohtyP ан яинавориммаргорп ывонсО
+Анна Смирнова — Основы программирования на Python: 7/10 (70.0%)
+Анна Смирнова — Основы программирования на Python: 7/10 (70.0%)
+Анна Смирнова — Основы программирования на Python: 7/10 (70.0%)
+Я 1071 Я
+b'\xd0\xaf'
+1 2
+
+
+lab_01/task_5.py
+Код завершения: 0
+Имя исследователя: Название эксперимента: Количество запусков: Длительность запуска в секундах: Действительная часть коэффициента: Мнимая часть коэффициента: ========================================
+ЭКСПЕРИМЕНТ: Проверка модели
+Исследователь: Анна Смирнова
+Запуски: 8
+Общее время: 100.00 с (1.67 мин)
+Коэффициент: (2-3j)
+Квадрат модуля: 13.00
+Есть выполненные запуски: True
+========================================
+Типы ввода: <class 'str'> <class 'str'> <class 'int'> <class 'float'> <class 'float'> <class 'float'>
+
+
+REPL
+14
+
+
+ast
+Module(
+   body=[
+      Expr(
+         value=Constant(value='Показываем результат выражения и простого присваивания.')),
+      Expr(
+         value=BinOp(
+            left=Constant(value=2),
+            op=Add(),
+            right=BinOp(
+               left=Constant(value=3),
+               op=Mult(),
+               right=Constant(value=4)))),
+      Expr(
+         value=Call(
+            func=Name(id='print', ctx=Load()),
+            args=[
+               BinOp(
+                  left=Constant(value=2),
+                  op=Add(),
+                  right=BinOp(
+                     left=Constant(value=3),
+                     op=Mult(),
+                     right=Constant(value=4)))],
+            keywords=[])),
+      Assign(
+         targets=[
+            Name(id='course', ctx=Store())],
+         value=Constant(value='Python')),
+      Assign(
+         targets=[
+            Name(id='hours', ctx=Store())],
+         value=BinOp(
+            left=Constant(value=4),
+            op=Mult(),
+            right=Constant(value=2))),
+      Expr(
+         value=Call(
+            func=Name(id='print', ctx=Load()),
+            args=[
+               JoinedStr(
+                  values=[
+                     FormattedValue(
+                        value=Name(id='course', ctx=Load()),
+                        conversion=-1),
+                     Constant(value=': '),
+                     FormattedValue(
+                        value=Name(id='hours', ctx=Load()),
+                        conversion=-1),
+                     Constant(value=' часов')])],
+            keywords=[]))],
+   type_ignores=[])
+
+
+dis
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Показываем результат выражения и простого присваивания.')
+              4 STORE_NAME               0 (__doc__)
+
+  3           6 NOP
+
+  4           8 PUSH_NULL
+             10 LOAD_NAME                1 (print)
+             12 LOAD_CONST               1 (14)
+             14 CALL                     1
+             22 POP_TOP
+
+  5          24 LOAD_CONST               2 ('Python')
+             26 STORE_NAME               2 (course)
+
+  6          28 LOAD_CONST               3 (8)
+             30 STORE_NAME               3 (hours)
+
+  7          32 PUSH_NULL
+             34 LOAD_NAME                1 (print)
+             36 LOAD_NAME                2 (course)
+             38 FORMAT_VALUE             0
+             40 LOAD_CONST               4 (': ')
+             42 LOAD_NAME                3 (hours)
+             44 FORMAT_VALUE             0
+             46 LOAD_CONST               5 (' часов')
+             48 BUILD_STRING             4
+             50 CALL                     1
+             58 POP_TOP
+             60 RETURN_CONST             6 (None)
+
+
+intentional_string_error
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+TypeError: 'str' object does not support item assignment
+
