@@ -4,7 +4,7 @@
 
 ## Установка и запуск
 
-В Windows откройте терминал в папке lab_05:
+В Windows откройте терминал в папке lab_05/tasks:
 
 ```powershell
 python -m venv .venv

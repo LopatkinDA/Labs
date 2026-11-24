@@ -2,5 +2,5 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .venv/
-programming_labs/lab_05/logs/
-programming_labs/lab_05/data/course.json
+lab_05/tasks/logs/
+lab_05/tasks/data/course.json
