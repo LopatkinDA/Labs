@@ -61,12 +61,35 @@ print('Теперь обе работы:', completed['lab_01'] & completed['lab_
 assert best[('daria', 'lab_02')] == 4
 assert attempts[('daria', 'lab_02')] == 1
 
-# Примеры запросов, включая ошибки.
-commands = ['student anna', 'best anna lab_01', 'attempts boris lab_02',
-            'completed lab_01', 'best nobody lab_99', 'delete anna', 'student', '']
-for command in commands:
-    print('Запрос:', command)
+# Команды можно вводить сколько угодно раз.
+help_text = '''Доступные команды:
+student anna — все попытки студента
+best anna lab_01 — лучшая оценка по работе
+attempts boris lab_02 — количество попыток
+completed lab_01 — студенты, сдававшие работу
+help — показать команды еще раз
+exit — завершить программу
+
+Студенты: anna, boris, daria
+Работы: lab_01, lab_02'''
+print(help_text)
+
+while True:
+    try:
+        command = input('Введите команду: ')
+    except (KeyboardInterrupt, EOFError):
+        print('\nПрограмма остановлена.')
+        break
+
     parts = command.split()
+    if len(parts) == 0:
+        continue
+    if parts == ['exit']:
+        print('Программа завершена.')
+        break
+    if parts == ['help']:
+        print(help_text)
+        continue
     if len(parts) == 2 and parts[0] == 'student':
         if parts[1] in by_student:
             print(by_student[parts[1]])
