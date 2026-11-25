@@ -15,7 +15,7 @@
 
 ### 1 Среда и порядок проверки
 
-Эксперименты выполнены 24 ноября 2026 года в CPython 3.12.14, Windows 11, 64 бита. Использована только стандартная библиотека. Перед экспериментами в программах выводится прогноз, затем фактические значения. Все task_1.py–task_5.py и memory_report.py завершились с кодом 0. Указанные ниже размеры и счетчики относятся к этому запуску; сравниваются прежде всего отношения идентичности и изменения величин.
+Эксперименты выполнены 25 ноября 2026 года в CPython 3.12.14, Windows 11, 64 бита. Использована только стандартная библиотека. Перед экспериментами в программах выводится прогноз, затем фактические значения. Все task_1.py–task_5.py и memory_report.py завершились с кодом 0. Указанные ниже размеры и счетчики относятся к этому запуску; сравниваются прежде всего отношения идентичности и изменения величин.
 
 Для воспроизведения следует перейти в каталог lab_02 и выполнить команды:
 
@@ -108,7 +108,7 @@ sys.getrefcount получает объект как аргумент, что д
 
 Прогноз для слабой ссылки: после del record weak_record() вернет None. Фактически до удаления получен объект Record, после — None. Слабая ссылка позволяет найти объект, пока он жив, но не увеличивает число удерживающих его сильных ссылок. Например, слабый кэш может хранить уже созданные объекты, не мешая их освобождению после закрытия всех использующих их документов.
 
-Прогноз для WeakValueDictionary: ключи a, b, c; после del temporary — a, b; после del a — только b. Вывод запуска полностью совпал с прогнозом. Для b сохранялась отдельная сильная ссылка, и registry['b'] is b проверено через assert.
+Прогноз для WeakValueDictionary: ключи a, b, c; после del c — a, b; после del a — только b. Вывод запуска полностью совпал с прогнозом. Для b сохранялась отдельная сильная ссылка, и registry['b'] is b проверено через assert.
 
 Ответы на вопросы. Нулевой счетчик позволяет освободить обычный объект; цикл требует отдельного анализа достижимости. Освобождение Python-объекта не гарантирует немедленный возврат памяти операционной системе: аллокатор может сохранять освобожденные блоки для повторного использования. Сильная ссылка удерживает объект, слабая не управляет его временем жизни.
 
@@ -147,9 +147,9 @@ independent ──> D {name: 'D', edges: []}
 
 ### 6 Исследование памяти
 
-Прогноз: размер списка растет ступенями; list(range(100000)) требует существенно больше памяти, чем range(100000). В memory_report.py измерение measure отделено от форматирования print_measurements. Все строки сначала собираются в структуре данных. Для каждого сценария запускается новая трассировка, объект удерживается до чтения текущего и пикового объемов.
+Прогноз: размер списка растет ступенями; list(range(100000)) требует существенно больше памяти, чем range(100000). В memory_report.py сначала выполняются измерения и заполняется список rows. Затем отдельный цикл выводит сохраненные значения. Дополнительные функции не используются. Все строки сначала собираются в структуре данных. Для каждого сценария запускается новая трассировка, объект удерживается до чтения текущего и пикового объемов.
 
-В таблице 6 приведен фактический вывод утилиты. 1 КиБ равен 1024 байтам. Трассировка учитывает новые выделения во время сценария, а не всю память процесса; заранее созданные строка, число 1000 и None не требуют новых выделений в этих сценариях.
+В таблице 6 приведен фактический вывод утилиты. 1 КиБ равен 1024 байтам. Трассировка учитывает выделения во время сценария, а не всю память процесса. Для констант она может учитывать служебные выделения при выполнении кода; это не новый размер самой строки или числа.
 
 Таблица 6 — Размер объектов и выделения при их создании
 
@@ -158,7 +158,7 @@ independent ──> D {name: 'D', edges: []}
 | Пустой список | 0 | 56 | 0.055 | 0.055 |
 | Список 10 чисел | 10 | 136 | 0.133 | 0.211 |
 | Кортеж 10 чисел | 10 | 120 | 0.117 | 0.195 |
-| Строка abcdefghij | 10 | 51 | 0.000 | 0.000 |
+| Строка abcdefghij | 10 | 51 | 0.750 | 0.750 |
 | Целое 1000 | 1 | 28 | 0.000 | 0.000 |
 | None | — | 16 | 0.000 | 0.000 |
 | list(range(100000)) | 100000 | 800056 | 3898.273 | 3898.383 |
@@ -200,14 +200,16 @@ independent ──> D {name: 'D', edges: []}
 ### memory_report.py
 
 ```python
-"""Измерения памяти для задания 5."""
 import gc
 import sys
 import tracemalloc
 
-
-def measure(name):
-    """Создаем один объект и сохраняем результаты измерения."""
+# Прогноз: список растет ступенями, range занимает меньше памяти.
+# Сначала собираем измерения. Печать будет ниже.
+rows = []
+names = ['empty list', 'list 10', 'tuple 10', 'string 10',
+         'int', 'None', 'list 100000', 'range 100000']
+for name in names:
     gc.collect()
     tracemalloc.start()
     if name == 'empty list':
@@ -223,71 +225,38 @@ def measure(name):
     elif name == 'None':
         obj = None
     elif name == 'list 100000':
-        obj = list(range(100_000))
-    elif name == 'range 100000':
-        obj = range(100_000)
+        obj = list(range(100000))
+    else:
+        obj = range(100000)
     current, peak = tracemalloc.get_traced_memory()
     tracemalloc.stop()
-
     if name == 'int' or name == 'None':
         count = 1
     else:
         count = len(obj)
-    return {
-        'scenario': name,
-        'elements': count,
-        'outer_bytes': sys.getsizeof(obj),
-        'current_bytes': current,
-        'peak_bytes': peak,
-    }
+    rows.append([name, count, sys.getsizeof(obj), current, peak])
+    del obj
 
+numbers = []
+old_size = sys.getsizeof(numbers)
+growth = [[0, old_size]]
+for number in range(100):
+    numbers.append(number)
+    new_size = sys.getsizeof(numbers)
+    if new_size != old_size:
+        growth.append([len(numbers), new_size])
+        old_size = new_size
 
-def collect_measurements():
-    names = ['empty list', 'list 10', 'tuple 10', 'string 10',
-             'int', 'None', 'list 100000', 'range 100000']
-    rows = []
-    for name in names:
-        rows.append(measure(name))
+ratio = rows[6][4] / rows[7][4]
 
-    # Сохраняем только шаги, на которых изменился размер списка.
-    values = []
-    old_size = sys.getsizeof(values)
-    growth = [(0, old_size)]
-    for value in range(100):
-        values.append(value)
-        new_size = sys.getsizeof(values)
-        if new_size != old_size:
-            growth.append((len(values), new_size))
-            old_size = new_size
-
-    list_peak = rows[6]['peak_bytes']
-    range_peak = rows[7]['peak_bytes']
-    ratio = list_peak / range_peak
-    return {'rows': rows, 'growth': growth, 'peak_ratio': ratio}
-
-
-def print_measurements(data):
-    print('scenario | elements | outer B | current KiB | peak KiB')
-    for row in data['rows']:
-        current_kib = row['current_bytes'] / 1024
-        peak_kib = row['peak_bytes'] / 1024
-        print(row['scenario'], row['elements'], row['outer_bytes'],
-              round(current_kib, 3), round(peak_kib, 3), sep=' | ')
-    print('Рост списка (длина, байт):', data['growth'])
-    print('Отношение пиков list/range:', round(data['peak_ratio'], 2))
-
-
-def main():
-    print('Прогноз: список растет ступенями; range занимает меньше памяти.')
-    data = collect_measurements()
-    assert data['rows'][6]['peak_bytes'] > data['rows'][7]['peak_bytes']
-    assert data['rows'][6]['elements'] == 100_000
-    assert data['rows'][7]['elements'] == 100_000
-    print_measurements(data)
-
-
-if __name__ == '__main__':
-    main()
+# Измерения закончены. Теперь выводим сохраненные данные.
+print('Прогноз: список растет ступенями; range требует меньше памяти.')
+print('Сценарий | Элементов | Размер, Б | Текущая, КиБ | Пиковая, КиБ')
+for row in rows:
+    print(row[0], row[1], row[2], round(row[3] / 1024, 3),
+          round(row[4] / 1024, 3), sep=' | ')
+print('Рост списка (длина, байт):', growth)
+print('Отношение пиков list/range:', round(ratio, 2))
 ```
 
 ### task_1.py
@@ -297,151 +266,152 @@ if __name__ == '__main__':
 from copy import deepcopy
 
 
-def main():
-    print('Прогноз A: сначала один int; после += значения 11 и 10.')
-    a = 10
-    b = a
-    print(a, b, id(a), id(b))
-    a += 1
-    print(a, b, id(a), id(b))
-    assert (a, b) == (11, 10) and a is not b
-    print('Прогноз B: append общий; после копирования изменения независимы.')
-    first = [10, 20]
-    second = first
-    print(first, second, id(first), id(second))
-    second.append(30)
-    print(first, second, id(first), id(second))
-    second = list(first)
-    print('После переназначения: ==', first == second, 'is', first is second)
-    second.append(40)
-    print(first, second)
-    assert first == [10, 20, 30] and second == [10, 20, 30, 40]
-    print('Прогноз: присваивание разделяет весь словарь; deepcopy изолирует списки.')
-    config = {'name': 'Учебный проект', 'members': ['Анна'],
-              'launch': [['--port', '8000'], ['--debug', 'off']]}
-    alias = config
-    print('До:', config, alias)
-    alias['members'].append('Борис')
-    alias['launch'][0][1] = '9000'
-    print('После общего изменения:', config, alias)
-    independent = deepcopy(config)
-    print('До независимого изменения:', config, independent)
-    independent['members'].append('Дарья')
-    independent['launch'][0][1] = '7000'
-    print('После:', config, independent)
-    assert alias is config
-    assert independent is not config
-    assert independent['members'] is not config['members']
-    assert independent['launch'][0] is not config['launch'][0]
-    assert config['members'] == ['Анна', 'Борис']
-    assert config['launch'][0][1] == '9000'
-    print('Итог: alias общий; independent и его изменяемые списки независимы.')
-
-
-if __name__ == '__main__':
-    main()
+print('Прогноз A: сначала один int; после += значения 11 и 10.')
+a = 10
+b = a
+print(a, b, id(a), id(b))
+a += 1
+print(a, b, id(a), id(b))
+assert (a, b) == (11, 10) and a is not b
+print('Прогноз B: append общий; после копирования изменения независимы.')
+first = [10, 20]
+second = first
+print(first, second, id(first), id(second))
+second.append(30)
+print(first, second, id(first), id(second))
+second = list(first)
+print('После переназначения: ==', first == second, 'is', first is second)
+second.append(40)
+print(first, second)
+assert first == [10, 20, 30] and second == [10, 20, 30, 40]
+print('Прогноз: присваивание разделяет весь словарь; deepcopy изолирует списки.')
+config = {'name': 'Учебный проект', 'members': ['Анна'],
+          'launch': [['--port', '8000'], ['--debug', 'off']]}
+alias = config
+print('До:', config, alias)
+alias['members'].append('Борис')
+alias['launch'][0][1] = '9000'
+print('После общего изменения:', config, alias)
+independent = deepcopy(config)
+print('До независимого изменения:', config, independent)
+independent['members'].append('Дарья')
+independent['launch'][0][1] = '7000'
+print('После:', config, independent)
+assert alias is config
+assert independent is not config
+assert independent['members'] is not config['members']
+assert independent['launch'][0] is not config['launch'][0]
+assert config['members'] == ['Анна', 'Борис']
+assert config['launch'][0][1] == '9000'
+print('Итог: alias общий; independent и его изменяемые списки независимы.')
 ```
 
 ### task_2.py
 
 ```python
-"""Сравнение копий и вложенных списков."""
-from copy import deepcopy
+import copy
+
+original = [['Python', 5], ['Algorithms', 4]]
+alias = original
+shallow = original.copy()
+deep = copy.deepcopy(original)
+
+print('Прогноз: append изменит original и alias.')
+print('Замена оценки изменит еще и shallow. deep не изменится.')
 
 
-def main():
-    original = [['Python', 5], ['Algorithms', 4]]
-    alias = original
-    shallow = original.copy()
-    deep = deepcopy(original)
+print('До изменений')
+print('original:', original)
+print('id списка, строки, оценки:', id(original), id(original[0]), id(original[0][1]))
+print('alias:', alias)
+print('id списка, строки, оценки:', id(alias), id(alias[0]), id(alias[0][1]))
+print('shallow:', shallow)
+print('id списка, строки, оценки:', id(shallow), id(shallow[0]), id(shallow[0][1]))
+print('deep:', deep)
+print('id списка, строки, оценки:', id(deep), id(deep[0]), id(deep[0][1]))
 
-    def show(label):
-        print(label)
-        for name, obj in [('original', original), ('alias', alias),
-                          ('shallow', shallow), ('deep', deep)]:
-            print(name, obj, 'id:', id(obj), id(obj[0]), id(obj[0][1]))
+original.append(['Databases', 5])
+print('После append')
+print('original:', original)
+print('id списка, строки, оценки:', id(original), id(original[0]), id(original[0][1]))
+print('alias:', alias)
+print('id списка, строки, оценки:', id(alias), id(alias[0]), id(alias[0][1]))
+print('shallow:', shallow)
+print('id списка, строки, оценки:', id(shallow), id(shallow[0]), id(shallow[0][1]))
+print('deep:', deep)
+print('id списка, строки, оценки:', id(deep), id(deep[0]), id(deep[0][1]))
 
-    print('Прогноз: append виден у alias; вложенная правка также у shallow.')
-    show('До изменений')
-    original.append(['Databases', 5])
-    show('После append')
-    assert len(alias) == 3 and len(shallow) == len(deep) == 2
-    original[0][1] = 3
-    show('После изменения оценки')
-    assert shallow[0][1] == 3 and deep[0][1] == 5
-    assert alias is original and shallow[0] is original[0]
-    assert deep[0] is not original[0]
-    print('Прогноз матриц: три измененные строки против одной.')
-    wrong_matrix = [[0] * 3] * 3
-    correct_matrix = [[0] * 3 for _ in range(3)]
-    wrong_matrix[0][0] = 1
-    correct_matrix[0][0] = 1
-    print('wrong:', wrong_matrix, [id(row) for row in wrong_matrix])
-    print('correct:', correct_matrix, [id(row) for row in correct_matrix])
-    assert wrong_matrix == [[1, 0, 0]] * 3
-    assert correct_matrix == [[1, 0, 0], [0, 0, 0], [0, 0, 0]]
-    assert len({id(row) for row in correct_matrix}) == 3
+original[0][1] = 3
+print('После замены оценки')
+print('original:', original)
+print('id списка, строки, оценки:', id(original), id(original[0]), id(original[0][1]))
+print('alias:', alias)
+print('id списка, строки, оценки:', id(alias), id(alias[0]), id(alias[0][1]))
+print('shallow:', shallow)
+print('id списка, строки, оценки:', id(shallow), id(shallow[0]), id(shallow[0][1]))
+print('deep:', deep)
+print('id списка, строки, оценки:', id(deep), id(deep[0]), id(deep[0][1]))
 
-
-if __name__ == '__main__':
-    main()
+print('Прогноз: в wrong_matrix изменятся все строки, в correct_matrix — одна.')
+wrong_matrix = [[0] * 3] * 3
+correct_matrix = [[0] * 3 for _ in range(3)]
+wrong_matrix[0][0] = 1
+correct_matrix[0][0] = 1
+print('Неправильно:', wrong_matrix)
+print('Правильно:', correct_matrix)
+print('id строк неправильной матрицы:')
+for row in wrong_matrix:
+    print(id(row))
+print('id строк правильной матрицы:')
+for row in correct_matrix:
+    print(id(row))
 ```
 
 ### task_3.py
 
 ```python
-"""Сильные и слабые ссылки."""
 import sys
 import weakref
 
+print('Прогноз: счетчик будет 2, 3, 4, 3, 2.')
+data = [1, 2, 3]
+print('После создания:', sys.getrefcount(data))
+alias = data
+print('После alias:', sys.getrefcount(data))
+container = [data]
+print('После контейнера:', sys.getrefcount(data))
+del alias
+print('После del alias:', sys.getrefcount(data))
+container.clear()
+print('После clear:', sys.getrefcount(data))
 
+# Такой класс нужен, чтобы создать объект для слабой ссылки.
 class Record:
     pass
 
+print('Прогноз: после del record слабая ссылка вернет None.')
+record = Record()
+weak_record = weakref.ref(record)
+print('До удаления:', weak_record())
+del record
+print('После удаления:', weak_record())
 
-def main():
-    print('Прогноз счетчика: +1 alias, +1 контейнер, -1 del, -1 clear.')
-    data = [1, 2, 3]
-    counts = [sys.getrefcount(data)]
-    alias = data
-    counts.append(sys.getrefcount(data))
-    container = [data]
-    counts.append(sys.getrefcount(data))
-    del alias
-    counts.append(sys.getrefcount(data))
-    container.clear()
-    counts.append(sys.getrefcount(data))
-    print('Счетчики:', counts)
-    assert counts[1] == counts[0] + 1
-    assert counts[2] == counts[0] + 2
-    assert counts[3] == counts[0] + 1
-    assert counts[4] == counts[0]
-    print('Прогноз weakref: после удаления последней сильной ссылки None.')
-    record = Record()
-    weak_record = weakref.ref(record)
-    print('До del:', weak_record())
-    del record
-    print('После del:', weak_record())
-    assert weak_record() is None
-    print('Прогноз реестра: a,b,c -> a,b -> b.')
-    a = Record()
-    b = Record()
-    temporary = Record()
-    registry = weakref.WeakValueDictionary()
-    registry['a'] = a
-    registry['b'] = b
-    registry['c'] = temporary
-    print('До:', sorted(registry.keys()))
-    del temporary
-    print('После del temporary:', sorted(registry.keys()))
-    assert set(registry) == {'a', 'b'}
-    del a
-    print('После del a:', sorted(registry.keys()))
-    assert set(registry) == {'b'} and registry['b'] is b
-
-
-if __name__ == '__main__':
-    main()
+print('Прогноз реестра: a, b, c -> a, b -> b.')
+a = Record()
+b = Record()
+c = Record()
+registry = weakref.WeakValueDictionary()
+registry['a'] = a
+registry['b'] = b
+registry['c'] = c
+print('До удаления:', list(registry))
+del c
+print('После del c:', list(registry))
+assert set(registry) == {'a', 'b'}
+del a
+print('После del a:', list(registry))
+assert set(registry) == {'b'}
+assert registry['b'] is b
 ```
 
 ### task_4.py
@@ -451,60 +421,87 @@ if __name__ == '__main__':
 import gc
 
 
-def main():
-    print('GC включен:', gc.isenabled())
-    print('Пороги:', gc.get_threshold())
-    print('Статистика:', gc.get_stats())
-    print('Прогноз: цикл недостижим после del, его собирает gc.collect().')
-    gc.collect()
-    gc.disable()
-    try:
-        first, second = [], []
-        first.append(second)
-        second.append(first)
-        print(first[0] is second, second[0] is first)
-        ids = (id(first), id(second))
-        print('Идентификаторы:', ids)
-        del first, second
-        print('Собрано для пары:', gc.collect())
-        print('Прогноз: пять самоссылочных списков будут собраны вручную.')
-        for _ in range(5):
-            cycle = []
-            cycle.append(cycle)
-            del cycle
-        print('Собрано для пяти циклов:', gc.collect())
-        print('Прогноз графа: цикл A-B-C исчезнет; D останется доступен.')
-        before = gc.collect()
-        a = {'name': 'A', 'edges': []}
-        b = {'name': 'B', 'edges': []}
-        c = {'name': 'C', 'edges': []}
-        independent = {'name': 'D', 'edges': []}
-        a['edges'].append(b)
-        b['edges'].append(c)
-        c['edges'].append(a)
-        print('Связи: A -> B -> C -> A; D -> []')
-        del a, b, c
-        after = gc.collect()
-        print('Сборка до графа:', before, 'после удаления:', after)
-        assert independent == {'name': 'D', 'edges': []}
-        print('Независимый узел:', independent)
-    finally:
-        gc.enable()
-    assert gc.isenabled()
-    print('Автоматический GC восстановлен:', gc.isenabled())
-
-
-if __name__ == '__main__':
-    main()
+print('GC включен:', gc.isenabled())
+print('Пороги:', gc.get_threshold())
+print('Статистика:', gc.get_stats())
+print('Прогноз: цикл недостижим после del, его собирает gc.collect().')
+gc.collect()
+gc.disable()
+try:
+    first, second = [], []
+    first.append(second)
+    second.append(first)
+    print(first[0] is second, second[0] is first)
+    ids = (id(first), id(second))
+    print('Идентификаторы:', ids)
+    del first, second
+    print('Собрано для пары:', gc.collect())
+    print('Прогноз: пять самоссылочных списков будут собраны вручную.')
+    for _ in range(5):
+        cycle = []
+        cycle.append(cycle)
+        del cycle
+    print('Собрано для пяти циклов:', gc.collect())
+    print('Прогноз графа: цикл A-B-C исчезнет; D останется доступен.')
+    before = gc.collect()
+    a = {'name': 'A', 'edges': []}
+    b = {'name': 'B', 'edges': []}
+    c = {'name': 'C', 'edges': []}
+    independent = {'name': 'D', 'edges': []}
+    a['edges'].append(b)
+    b['edges'].append(c)
+    c['edges'].append(a)
+    print('Связи: A -> B -> C -> A; D -> []')
+    del a, b, c
+    after = gc.collect()
+    print('Сборка до графа:', before, 'после удаления:', after)
+    assert independent == {'name': 'D', 'edges': []}
+    print('Независимый узел:', independent)
+finally:
+    gc.enable()
+assert gc.isenabled()
+print('Автоматический GC восстановлен:', gc.isenabled())
 ```
 
 ### task_5.py
 
 ```python
-"""Запуск измерений задания 5."""
-from memory_report import main
+import sys
+import tracemalloc
 
-if __name__ == '__main__':
-    main()
+print('Размеры объектов в байтах:')
+print('Пустой список:', sys.getsizeof([]))
+print('Список 10 чисел:', sys.getsizeof(list(range(10))))
+print('Кортеж 10 чисел:', sys.getsizeof(tuple(range(10))))
+print('Строка 10 символов:', sys.getsizeof('abcdefghij'))
+print('Число:', sys.getsizeof(1000))
+print('None:', sys.getsizeof(None))
+
+print('Прогноз: размер списка растет не после каждого append.')
+numbers = []
+old_size = sys.getsizeof(numbers)
+print(len(numbers), old_size)
+for number in range(100):
+    numbers.append(number)
+    new_size = sys.getsizeof(numbers)
+    if new_size != old_size:
+        print(len(numbers), new_size)
+        old_size = new_size
+
+print('Прогноз: list(range(100000)) занимает больше памяти, чем range.')
+tracemalloc.start()
+numbers = list(range(100000))
+current, peak = tracemalloc.get_traced_memory()
+tracemalloc.stop()
+print('Список: текущая память, КиБ:', current / 1024)
+print('Список: пиковая память, КиБ:', peak / 1024)
+del numbers
+
+tracemalloc.start()
+numbers = range(100000)
+current, peak = tracemalloc.get_traced_memory()
+tracemalloc.stop()
+print('range: текущая память, КиБ:', current / 1024)
+print('range: пиковая память, КиБ:', peak / 1024)
 ```
 

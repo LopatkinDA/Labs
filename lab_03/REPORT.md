@@ -15,7 +15,7 @@
 
 ### 1 Среда и запуск
 
-Работа выполнена 24 ноября 2026 года в CPython 3.12.14, Windows 11, 64 бита. Использована только стандартная библиотека. Все пять файлов завершились с кодом 0, проверки assert пройдены. Для запуска следует перейти в каталог lab_03:
+Работа выполнена 25 ноября 2026 года в CPython 3.12.14, Windows 11, 64 бита. Использована только стандартная библиотека. Все пять файлов завершились с кодом 0, проверки assert пройдены. Для запуска следует перейти в каталог lab_03:
 
 ```text
 python task_1.py
@@ -29,7 +29,7 @@ python task_5.py
 
 ### 2 Условия и классификация
 
-В classify_record сначала проверяются диапазоны балла 0..100 и пропусков 0..5. При ошибке функция сразу возвращает сообщение и не выполняет классификацию. Затем пороги проверяются по убыванию: 90, 75, 60; ветвь else соответствует 0..59. При пропусках больше трех индекс уровня уменьшается, если он больше нуля. match/case выбирает пояснение для exam, project, practice и неизвестного типа.
+В task_1.py обычные if/elif сначала проверяют диапазоны балла 0..100 и пропусков 0..5. При ошибке выводится сообщение, а блок else с классификацией не выполняется. Затем пороги проверяются по убыванию: 90, 75, 60; ветвь else соответствует 0..59. При пропусках больше трех отдельная цепочка if/elif заменяет уровень на предыдущий. Недостаточный уровень остается без изменений. match/case выбирает пояснение для exam, project, practice и неизвестного типа.
 
 Результаты сценариев приведены в таблице 1. Во всех строках ожидаемый результат совпал с фактическим; тип работы дополнительно определил соответствующее пояснение.
 
@@ -51,7 +51,7 @@ python task_5.py
 | 80 | exam | −1 и 6 | ошибка пропусков | ошибка пропусков |
 | 80 | other | 0 | хороший; неизвестный тип | хороший; неизвестный тип |
 
-При выбранном порядке недостижимых ветвей нет: первая успешная проверка отсекает верхнюю часть диапазона, а следующие работают с оставшимися значениями. В каждой последующей ветви значения выше предыдущего порога уже недостижимы. Если поставить score >= 60 раньше score >= 90 в одной цепочке elif, высокий уровень окажется недостижимым. После раннего возврата по ошибке классификация также недостижима — это предусмотренное поведение.
+При выбранном порядке недостижимых ветвей нет: первая успешная проверка отсекает верхнюю часть диапазона, а следующие работают с оставшимися значениями. В каждой последующей ветви значения выше предыдущего порога уже недостижимы. Если поставить score >= 60 раньше score >= 90 в одной цепочке elif, высокий уровень окажется недостижимым. При ошибке диапазона блок else с классификацией пропускается — это предусмотренное поведение.
 
 Обработаны десять записей из первых десяти сценариев. Получены готовые строки для каждой записи и сводка: недостаточный — 3, удовлетворительный — 2, хороший — 3, отличный — 2. Исходный список сравнен с копией и не изменен. Обработка одной записи требует O(1) времени и памяти, группы из n записей — O(n) времени; счетчики четырех категорий занимают O(1) дополнительной памяти, не считая входа и вывода.
 
@@ -59,7 +59,7 @@ python task_5.py
 
 Для measurements = [12, 15, 11, 18, 18, 9, 21, 15, 7, 18] за первый проход вычислены сумма 144, минимум 7, максимум 21 и число четных 4. Среднее равно 14.4. Вторым проходом найдено 6 значений выше среднего: 15, 18, 18, 21, 15, 18. Результат сравнен с заранее заданным кортежем (144, 7, 21, 4, 14.4, 6).
 
-Линейный поиск 18 вернул индекс 3 после четырех сравнений элементов с целью; поиск 99 вернул −1 после десяти сравнений. Индексы отсчитываются от нуля. Для пустого списка statistics возвращает None.
+Линейный поиск 18 вернул индекс 3 после четырех сравнений элементов с целью; поиск 99 вернул −1 после десяти сравнений. Индексы отсчитываются от нуля. Данный фрагмент работает с заданным непустым списком measurements; для пустого списка перед обращением к первому элементу потребовалась бы отдельная проверка.
 
 Псевдокод первого алгоритма:
 
@@ -145,7 +145,7 @@ python task_5.py
 | boris, lab_02 | 5 | 1 |
 | daria, lab_01 | 3 | 1 |
 
-Пересечение множеств сдавших lab_01 и lab_02 дало {anna, boris}. После add(index, ('daria', 'lab_02', 4)) появилась одна новая пара с результатом 4 и одной попыткой, обновились список Дарьи и множество сдавших lab_02. Полное перестроение не выполнялось; теперь обе работы сдавали все три студента.
+Пересечение множеств сдавших lab_01 и lab_02 дало {anna, boris}. После добавления ('daria', 'lab_02', 4) появилась одна новая пара с результатом 4 и одной попыткой, обновились список Дарьи и множество сдавших lab_02. Полное перестроение не выполнялось; теперь обе работы сдавали все три студента.
 
 Множество хранит уникальные хешируемые значения. Составной ключ из двух строк хешируем, потому что кортеж неизменяем и его элементы хешируемы. Не любой кортеж является допустимым ключом: наличие списка внутри делает его нехешируемым. Список сам изменяем и не имеет подходящего хеша, поэтому ключом быть не может. Словарь дает прямой поиск по паре, тогда как список записей пришлось бы просматривать.
 
@@ -204,7 +204,7 @@ B  builtins: len, print, ValueError и другие
 
 Рисунок 1 — Области видимости LEGB
 
-Во вложенной функции marker находится в L, course из-за nonlocal — в E, len — в B после безуспешного поиска в L, E и G. В main имя course находится в G; outer также находится в G. Результат outer — ('Локальный курс: обновлен', 8), глобальное course сохранило «Основы программирования». В фабрике threshold принадлежит E, value — L возвращенной функции. Поля словарей и атрибуты объектов не являются самостоятельными уровнями LEGB.
+Во вложенной функции marker находится в L, course из-за nonlocal — в E, len — в B после безуспешного поиска в L, E и G. В коде на уровне модуля course и outer находятся в G. Результат outer — ('Локальный курс: обновлен', 8), глобальное course сохранило «Основы программирования». В фабрике threshold принадлежит E, value — L возвращенной функции. Поля словарей и атрибуты объектов не являются самостоятельными уровнями LEGB.
 
 У ошибочной функции bad_add_result список по умолчанию создается один раз при выполнении def. Поэтому вызовы с 1 и 2 вернули один объект [1, 2]. В исправленной функции по умолчанию None, а результат создается заново: [1] и [2]. Явно переданный список также не изменяется, поскольку сначала выполняется results.copy(), а затем append(value) для копии. Это требует O(n) времени и памяти; у ошибочного append было амортизированное O(1), но неверный жизненный цикл состояния.
 
@@ -236,10 +236,9 @@ apply_to_results(double, [1,2,3]) вернула [2,4,6], а с lambda x: x+5 �
 | А: [80,100], Б: [90] | 90; два лидера А, Б | 90.0; А, Б |
 | Пустая группа | None; [] | None; [] |
 | А: [], Б: [60] | 60; Б; А без данных | 60.0; Б; А без данных |
-| А: [] | None; [] | None; [] |
 | По студенту на 0,59,60,74,75,89,90,100 | 547/8; лидер 100 | 68.375; лидер 100 |
 
-Для границ отдельно проверены категории: 0 и 59 — недостаточный; 60 и 74 — удовлетворительный; 75 и 89 — хороший; 90 и 100 — отличный. Дополнительно проверены минимум и максимум, форматирование пустых данных. Во всех семи групповых сценариях подтверждена неизменность входных данных.
+Для границ отдельно проверены категории: 0 и 59 — недостаточный; 60 и 74 — удовлетворительный; 75 и 89 — хороший; 90 и 100 — отличный. Дополнительно проверены минимум и максимум, форматирование пустых данных. Проверены шесть сценариев. Для основной группы дополнительно проверена неизменность входных данных.
 
 Таблица 10 — Контракты публичных функций
 
@@ -253,9 +252,8 @@ apply_to_results(double, [1,2,3]) вернула [2,4,6], а с lambda x: x+5 �
 | group_summary(students) | dict имен и допустимых списков баллов | Числа студентов и оценок, общее среднее, категории, лидеры, рейтинг; пустые данные допустимы |
 | find_top_students(students) | Тот же dict | Список всех имен с максимальным средним; пусто или все без данных → [] |
 | format_report(student_data, group_data) | Список сводок и словарь group_summary | Строка отчета; None заменяется словами; вход не меняется |
-| rank(summaries) | Список корректных словарей student_summary | Новый список по убыванию среднего; None в конце; равные стабильны |
 
-Функции не изменяют входные коллекции. Считаем, что входные значения соответствуют контрактам: баллы — целые числа от 0 до 100. Названия name должны быть строками; повторяющиеся имена в словаре невозможны.
+В заданиях 1–3 код записан последовательными блоками без функций. В заданиях 4–5 оставлены функции, требуемые условием. Рейтинг формируется прямо в group_summary. Функции не изменяют входные коллекции. Считаем, что входные значения соответствуют контрактам: баллы — целые числа от 0 до 100. Названия name должны быть строками; повторяющиеся имена в словаре невозможны.
 
 Пусть S — число студентов, M — общее число оценок. mean, minimum и maximum требуют O(k) времени для списка длины k и O(1) дополнительной памяти. student_summary выполняет несколько линейных проходов, но остается O(k) и создает сводку постоянного размера. find_top_students требует O(M+S) времени и до O(S) памяти для всех лидеров. Сбор числовой статистики группы имеет O(M+S), пузырьковая сортировка рейтинга — O(S²) в худшем случае. Поэтому group_summary в данной реализации требует O(M+S²) времени и O(S) дополнительной памяти. format_report линеен по объему формируемого текста и хранит этот текст в памяти. Повторные проходы при построении сводок и поиске лидеров не меняют порядок роста, но увеличивают постоянный коэффициент.
 
@@ -276,268 +274,304 @@ apply_to_results(double, [1,2,3]) вернула [2,4,6], а с lambda x: x+5 �
 ### task_1.py
 
 ```python
-"""Условия, match и обработка группы записей."""
-LEVELS = ('недостаточный', 'удовлетворительный', 'хороший', 'отличный')
+# Балл, тип работы, пропуски.
+records = [
+    (0, 'exam', 0),
+    (59, 'project', 3),
+    (60, 'practice', 0),
+    (74, 'exam', 3),
+    (75, 'project', 0),
+    (89, 'practice', 3),
+    (90, 'exam', 0),
+    (100, 'project', 3),
+    (90, 'exam', 4),
+    (60, 'practice', 5),
+]
+before = records.copy()
+counts = {'недостаточный': 0, 'удовлетворительный': 0,
+          'хороший': 0, 'отличный': 0}
 
-
-def classify_record(score: int, work_type: str, absences: int) -> tuple[str, str]:
-    """Возвращает уровень и пояснение; ошибка диапазона прекращает классификацию."""
-    if not 0 <= score <= 100:
-        return '', 'Ошибка: результат вне диапазона 0..100'
-    elif not 0 <= absences <= 5:
-        return '', 'Ошибка: пропуски вне диапазона 0..5'
+# Одна запись, десять записей группы и дополнительные проверки.
+checks = [(90, 'exam', 0)]
+checks += records
+checks += [(-1, 'exam', 0), (101, 'exam', 0),
+           (80, 'exam', -1), (80, 'exam', 6),
+           (80, 'other', 0)]
+expected = ['отличный',
+ 'недостаточный',
+ 'недостаточный',
+ 'удовлетворительный',
+ 'удовлетворительный',
+ 'хороший',
+ 'хороший',
+ 'отличный',
+ 'отличный',
+ 'хороший',
+ 'недостаточный',
+ '',
+ '',
+ '',
+ '',
+ 'хороший']
+for i in range(len(checks)):
+    score, work_type, absences = checks[i]
+    print('Данные:', score, work_type, absences)
+    if score < 0 or score > 100:
+        print('Ошибка: балл должен быть от 0 до 100')
+    elif absences < 0 or absences > 5:
+        print('Ошибка: пропуски должны быть от 0 до 5')
     else:
         if score >= 90:
-            index = 3
+            level = 'отличный'
         elif score >= 75:
-            index = 2
+            level = 'хороший'
         elif score >= 60:
-            index = 1
+            level = 'удовлетворительный'
         else:
-            index = 0
-    if absences > 3 and index > 0:
-        index -= 1
-    match work_type:
-        case 'exam':
-            description = 'экзаменационная работа'
-        case 'project':
-            description = 'проектная работа'
-        case 'practice':
-            description = 'практическая работа'
-        case _:
-            description = 'неизвестный тип работы'
-    return LEVELS[index], description
+            level = 'недостаточный'
+        if absences > 3:
+            if level == 'отличный':
+                level = 'хороший'
+            elif level == 'хороший':
+                level = 'удовлетворительный'
+            elif level == 'удовлетворительный':
+                level = 'недостаточный'
+        match work_type:
+            case 'exam':
+                description = 'экзаменационная работа'
+            case 'project':
+                description = 'проектная работа'
+            case 'practice':
+                description = 'практическая работа'
+            case _:
+                description = 'неизвестный тип работы'
+        print(description + '; уровень: ' + level)
+        print('Ожидалось:', expected[i])
+        assert level == expected[i]
+        # В сводку входят только десять записей группы.
+        if 1 <= i <= 10:
+            counts[level] += 1
+print('Сводка:', counts)
+assert counts == {'недостаточный': 3, 'удовлетворительный': 2,
+                  'хороший': 3, 'отличный': 2}
 
-
-def main():
-    cases = [(0, 'exam', 0, LEVELS[0]), (59, 'project', 3, LEVELS[0]),
-             (60, 'practice', 0, LEVELS[1]), (74, 'exam', 3, LEVELS[1]),
-             (75, 'project', 0, LEVELS[2]), (89, 'practice', 3, LEVELS[2]),
-             (90, 'exam', 0, LEVELS[3]), (100, 'project', 3, LEVELS[3]),
-             (90, 'exam', 4, LEVELS[2]), (60, 'practice', 5, LEVELS[0]),
-             (-1, 'exam', 0, ''), (101, 'exam', 0, ''),
-             (80, 'exam', -1, ''), (80, 'exam', 6, ''),
-             (80, 'other', 0, LEVELS[2])]
-    for score, kind, absences, expected in cases:
-        actual, description = classify_record(score, kind, absences)
-        assert actual == expected
-        print((score, kind, absences), 'ожидалось:', expected,
-              'получено:', actual, description)
-    records = []
-    for score, kind, absences, expected in cases[:10]:
-        records.append((score, kind, absences))
-    before = records.copy()
-    counts = {}
-    for level in LEVELS:
-        counts[level] = 0
-    for score, kind, absences in records:
-        level, description = classify_record(score, kind, absences)
-        counts[level] += 1
-        print(score, kind, absences, ':', description, '; уровень', level)
-    assert records == before
-    assert counts == {LEVELS[0]: 3, LEVELS[1]: 2, LEVELS[2]: 3, LEVELS[3]: 2}
-    print('Сводка:', counts)
-    print('Проверки задания 1 пройдены')
-
-
-if __name__ == '__main__':
-    main()
+assert records == before
 ```
 
 ### task_2.py
 
 ```python
-"""Накопление, поиск, сортировка выбором и проверка простоты."""
+measurements = [12, 15, 11, 18, 18, 9, 21, 15, 7, 18]
 
+# Первый проход: сумма, минимум, максимум и четные числа.
+total = 0
+low = measurements[0]
+high = measurements[0]
+even = 0
+for number in measurements:
+    total += number
+    if number < low:
+        low = number
+    if number > high:
+        high = number
+    if number % 2 == 0:
+        even += 1
 
-def statistics(values):
-    if not values:
-        return None
-    total = 0
-    even = 0
-    low = values[0]
-    high = values[0]
-    for value in values:
-        total += value
-        if value < low:
-            low = value
-        if value > high:
-            high = value
-        if value % 2 == 0:
-            even += 1
-    average = total / len(values)
-    above = 0
-    for value in values:
-        if value > average:
-            above += 1
-    return total, low, high, even, average, above
+# Второй проход: числа выше среднего.
+average = total / len(measurements)
+above = 0
+for number in measurements:
+    if number > average:
+        above += 1
+print('Сумма:', total)
+print('Минимум:', low)
+print('Максимум:', high)
+print('Четных:', even)
+print('Среднее:', average)
+print('Выше среднего:', above)
+assert (total, low, high, even, average, above) == (144, 7, 21, 4, 14.4, 6)
 
+# Линейный поиск останавливается на первом совпадении.
+target = int(input('Искомое число: '))
+found = -1
+comparisons = 0
+for i in range(len(measurements)):
+    comparisons += 1
+    if measurements[i] == target:
+        found = i
+        break
+print('Индекс:', found)
+print('Сравнений:', comparisons)
 
-def linear_search(values, target):
-    comparisons = 0
-    for index in range(len(values)):
-        comparisons += 1
-        if values[index] == target:
-            return index, comparisons
-    return -1, comparisons
-
-
-def selection_sort(values):
-    result = list(values)
-    for i in range(len(result) - 1):
-        smallest = i
-        for j in range(i + 1, len(result)):
-            if result[j] < result[smallest]:
-                smallest = j
-        temporary = result[i]
-        result[i] = result[smallest]
-        result[smallest] = temporary
-    return result
-
-
-def binary_search(values, target):
-    left = 0
-    right = len(values) - 1
-    comparisons = 0
-    while left <= right:
-        middle = (left + right) // 2
-        comparisons += 1
-        if values[middle] == target:
-            return middle, comparisons
-        comparisons += 1
-        if values[middle] < target:
-            left = middle + 1
-        else:
-            right = middle - 1
-    return -1, comparisons
-
-
-def is_prime(number):
-    if number < 2:
-        return False
+# Для 0 и 1 результат сразу False.
+for number in [0, 1, 2, 4, 49, 97]:
+    prime = number >= 2
     divisor = 2
     while divisor * divisor <= number:
         if number % divisor == 0:
-            return False
+            prime = False
+            break
         divisor += 1
-    return True
+    print('Простое число:', number, prime)
+    if number == 2 or number == 97:
+        assert prime
+    else:
+        assert not prime
 
+# Сортировка выбором копии списка.
+sample = [3, 1, 2, 1]
+result = sample.copy()
+for i in range(len(result) - 1):
+    smallest = i
+    for j in range(i + 1, len(result)):
+        if result[j] < result[smallest]:
+            smallest = j
+    temporary = result[i]
+    result[i] = result[smallest]
+    result[smallest] = temporary
+print('После сортировки:', result)
+assert result == [1, 1, 2, 3]
+assert sample == [3, 1, 2, 1]
 
-def main():
-    measurements = [12, 15, 11, 18, 18, 9, 21, 15, 7, 18]
-    actual = statistics(measurements)
-    assert actual == (144, 7, 21, 4, 14.4, 6)
-    assert statistics([]) is None
-    print('Сумма, min, max, четные, среднее, выше среднего:', actual)
-    target = int(input('Искомое число: '))
-    print('Линейный поиск:', target, linear_search(measurements, target))
-    assert linear_search(measurements, 18) == (3, 4)
-    assert linear_search(measurements, 99) == (-1, 10)
-    for number, expected in [(1, False), (2, True), (4, False),
-                             (49, False), (97, True), (0, False)]:
-        assert is_prime(number) == expected
-        print('Простое:', number, is_prime(number))
-    sample = [3, 1, 2, 1]
-    assert selection_sort(sample) == [1, 1, 2, 3] and sample == [3, 1, 2, 1]
-    assert selection_sort([]) == []
-    assert binary_search([], 1) == (-1, 0)
-    print('n | target | linear comparisons | binary comparisons')
-    for n in (10, 100, 1000):
-        values = selection_sort(list(range(n - 1, -1, -1)))
-        for target in (0, n // 2, n - 1, n):
-            linear, c1 = linear_search(values, target)
-            binary, c2 = binary_search(values, target)
-            assert linear == binary
-            print(n, target, c1, c2, sep=' | ')
-    print('Проверки задания 2 пройдены')
-
-
-if __name__ == '__main__':
-    main()
+# Сравниваем два поиска на одинаковых отсортированных списках.
+print('n | цель | линейный | бинарный')
+for n in [10, 100, 1000]:
+    numbers = list(range(n - 1, -1, -1))
+    for i in range(len(numbers) - 1):
+        smallest = i
+        for j in range(i + 1, len(numbers)):
+            if numbers[j] < numbers[smallest]:
+                smallest = j
+        temporary = numbers[i]
+        numbers[i] = numbers[smallest]
+        numbers[smallest] = temporary
+    for target in [0, n // 2, n - 1, n]:
+        linear_index = -1
+        linear_count = 0
+        for i in range(len(numbers)):
+            linear_count += 1
+            if numbers[i] == target:
+                linear_index = i
+                break
+        binary_index = -1
+        binary_count = 0
+        left = 0
+        right = len(numbers) - 1
+        while left <= right:
+            middle = (left + right) // 2
+            binary_count += 1
+            if numbers[middle] == target:
+                binary_index = middle
+                break
+            binary_count += 1
+            if numbers[middle] < target:
+                left = middle + 1
+            else:
+                right = middle - 1
+        assert linear_index == binary_index
+        if target == n:
+            assert binary_index == -1
+        else:
+            assert binary_index == target
+        print(n, target, linear_count, binary_count, sep=' | ')
 ```
 
 ### task_3.py
 
 ```python
-"""Индексы результатов и безопасный разбор запросов."""
-SUBMISSIONS = [('anna', 'lab_01', 5), ('boris', 'lab_01', 4),
-               ('anna', 'lab_02', 5), ('daria', 'lab_01', 3),
-               ('boris', 'lab_02', 5), ('anna', 'lab_01', 4)]
+submissions = [
+    ('anna', 'lab_01', 5),
+    ('boris', 'lab_01', 4),
+    ('anna', 'lab_02', 5),
+    ('daria', 'lab_01', 3),
+    ('boris', 'lab_02', 5),
+    ('anna', 'lab_01', 4),
+]
+students = set()
+labs = set()
+by_student = {}
+best = {}
+attempts = {}
+completed = {}
 
+for student, lab, score in submissions:
+    students.add(student)
+    labs.add(lab)
+    if student not in by_student:
+        by_student[student] = []
+    by_student[student].append((lab, score))
+    key = (student, lab)
+    if key not in best or score > best[key]:
+        best[key] = score
+    if key not in attempts:
+        attempts[key] = 0
+    attempts[key] += 1
+    if lab not in completed:
+        completed[lab] = set()
+    completed[lab].add(student)
 
-def empty_index():
-    return {'students': set(), 'labs': set(), 'by_student': {},
-            'best': {}, 'attempts': {}, 'completed': {}}
+print('Студенты:', students)
+print('Работы:', labs)
+print('Попытки студентов:', by_student)
+print('Лучшие результаты:', best)
+print('Количество попыток:', attempts)
+print('Обе работы:', completed['lab_01'] & completed['lab_02'])
+assert best[('anna', 'lab_01')] == 5
+assert attempts[('anna', 'lab_01')] == 2
+assert completed['lab_01'] & completed['lab_02'] == {'anna', 'boris'}
 
+# Добавляем одну запись, старые повторно не обрабатываем.
+student, lab, score = 'daria', 'lab_02', 4
+submissions.append((student, lab, score))
+students.add(student)
+labs.add(lab)
+if student not in by_student:
+    by_student[student] = []
+by_student[student].append((lab, score))
+key = (student, lab)
+if key not in best or score > best[key]:
+    best[key] = score
+if key not in attempts:
+    attempts[key] = 0
+attempts[key] += 1
+if lab not in completed:
+    completed[lab] = set()
+completed[lab].add(student)
+print('После добавления:', by_student)
+print('Теперь обе работы:', completed['lab_01'] & completed['lab_02'])
+assert best[('daria', 'lab_02')] == 4
+assert attempts[('daria', 'lab_02')] == 1
 
-def add(index, record):
-    student, lab, score = record
-    key = student, lab
-    index['students'].add(student)
-    index['labs'].add(lab)
-    if student not in index['by_student']:
-        index['by_student'][student] = []
-    index['by_student'][student].append((lab, score))
-    if key not in index['best'] or score > index['best'][key]:
-        index['best'][key] = score
-    if key not in index['attempts']:
-        index['attempts'][key] = 0
-    index['attempts'][key] += 1
-    if lab not in index['completed']:
-        index['completed'][lab] = set()
-    index['completed'][lab].add(student)
-
-
-def query(index, command):
+# Примеры запросов, включая ошибки.
+commands = ['student anna', 'best anna lab_01', 'attempts boris lab_02',
+            'completed lab_01', 'best nobody lab_99', 'delete anna', 'student', '']
+for command in commands:
+    print('Запрос:', command)
     parts = command.split()
     if len(parts) == 2 and parts[0] == 'student':
-        name = parts[1]
-        if name in index['by_student']:
-            return str(index['by_student'][name])
-        return 'Нет данных'
+        if parts[1] in by_student:
+            print(by_student[parts[1]])
+        else:
+            print('Нет данных')
     elif len(parts) == 3 and parts[0] == 'best':
         key = (parts[1], parts[2])
-        if key in index['best']:
-            return str(index['best'][key])
-        return 'Нет данных'
+        if key in best:
+            print(best[key])
+        else:
+            print('Нет данных')
     elif len(parts) == 3 and parts[0] == 'attempts':
         key = (parts[1], parts[2])
-        if key in index['attempts']:
-            return str(index['attempts'][key])
-        return 'Нет данных'
+        if key in attempts:
+            print(attempts[key])
+        else:
+            print('Нет данных')
     elif len(parts) == 2 and parts[0] == 'completed':
-        lab = parts[1]
-        if lab in index['completed']:
-            return str(sorted(index['completed'][lab]))
-        return 'Нет данных'
-    return 'Неизвестная команда или неверное число аргументов'
-
-
-def main():
-    index = empty_index()
-    for record in SUBMISSIONS:
-        add(index, record)
-    print('Индексы до добавления:', index)
-    both = index['completed']['lab_01'] & index['completed']['lab_02']
-    print('Обе работы:', sorted(both))
-    assert both == {'anna', 'boris'}
-    assert index['best'][('anna', 'lab_01')] == 5
-    assert index['attempts'][('anna', 'lab_01')] == 2
-    add(index, ('daria', 'lab_02', 4))
-    print('После добавления daria lab_02 4:', index)
-    assert index['attempts'][('daria', 'lab_02')] == 1
-    for command in ('student anna', 'best anna lab_01', 'attempts boris lab_02',
-                    'completed lab_01', 'best nobody lab_99', 'delete anna',
-                    'student', ''):
-        print(command, '=>', query(index, command))
-    assert query(index, 'best anna lab_01') == '5'
-    assert query(index, 'best nobody lab_99') == 'Нет данных'
-    assert query(index, 'student').startswith('Неизвестная')
-    print('Проверки задания 3 пройдены')
-
-
-if __name__ == '__main__':
-    main()
+        if parts[1] in completed:
+            print(sorted(completed[parts[1]]))
+        else:
+            print('Нет данных')
+    else:
+        print('Неизвестная команда или неверное число аргументов')
 ```
 
 ### task_4.py
@@ -635,55 +669,50 @@ def double(value):
     return value * 2
 
 
-def main():
-    assert arithmetic_mean([1.0, 3.0]) == 2.0
-    assert arithmetic_mean([5.0]) == 5.0
-    assert arithmetic_mean([-2.0, 2.0]) == 0.0
-    try:
-        arithmetic_mean([])
-    except ValueError:
-        pass
-    else:
-        raise AssertionError('Ожидался ValueError')
-    assert normalize_name('  иВАН   иВАНОВ ') == 'Иван Иванов'
-    assert normalize_name('') == ''
-    assert normalize_name(' АННА ') == 'Анна'
-    assert build_report('анна', [80, 90]) == 'Результат: Анна — 85.00'
-    assert build_report('борис', [], prefix='Итог') == 'Итог: Борис — нет данных'
-    assert build_report(student='дарья', results=[91], precision=0) == 'Результат: Дарья — 91'
-    assert collect_tags(' Python ', 'python', '', 'IT') == ('python', 'it')
-    assert collect_tags('A', 'a', lowercase=False) == ('A', 'a')
-    assert collect_tags() == ()
-    values = [80, 90]
-    before = values.copy()
-    arguments = ['анна', values]
-    options = {'precision': 1, 'prefix': 'Итог'}
-    print(build_report(*arguments, **options))
-    assert values == before
-    print('Теги:', collect_tags(' Python ', 'python', ' IT '))
-    print('LEGB:', outer(), 'global:', course)
-    assert course == 'Основы программирования'
-    first = bad_add_result(1)
-    second = bad_add_result(2)
-    assert first is second and first == [1, 2]
-    print('Общий default:', first, second)
-    assert add_result(1) == [1] and add_result(2) == [2]
-    assert add_result(3, values) == [80, 90, 3] and values == before
-    print('Исправлено:', add_result(1), add_result(2))
-    print('Именованная функция:', apply_to_results(double, [1, 2, 3]))
-    print('lambda:', apply_to_results(lambda x: x + 5, [1, 2, 3]))
-    assert apply_to_results(double, [1, 2]) == [2, 4]
-    assert apply_to_results(lambda x: x + 5, [1, 2]) == [6, 7]
-    check60 = make_threshold_checker(60)
-    check90 = make_threshold_checker(90)
-    assert check60(75) and not check90(75)
-    assert check60(60) and check90(90)
-    print('Пороги 60 и 90 для 75:', check60(75), check90(75))
-    print('Проверки задания 4 пройдены')
-
-
-if __name__ == '__main__':
-    main()
+assert arithmetic_mean([1.0, 3.0]) == 2.0
+assert arithmetic_mean([5.0]) == 5.0
+assert arithmetic_mean([-2.0, 2.0]) == 0.0
+try:
+    arithmetic_mean([])
+except ValueError:
+    pass
+else:
+    raise AssertionError('Ожидался ValueError')
+assert normalize_name('  иВАН   иВАНОВ ') == 'Иван Иванов'
+assert normalize_name('') == ''
+assert normalize_name(' АННА ') == 'Анна'
+assert build_report('анна', [80, 90]) == 'Результат: Анна — 85.00'
+assert build_report('борис', [], prefix='Итог') == 'Итог: Борис — нет данных'
+assert build_report(student='дарья', results=[91], precision=0) == 'Результат: Дарья — 91'
+assert collect_tags(' Python ', 'python', '', 'IT') == ('python', 'it')
+assert collect_tags('A', 'a', lowercase=False) == ('A', 'a')
+assert collect_tags() == ()
+values = [80, 90]
+before = values.copy()
+arguments = ['анна', values]
+options = {'precision': 1, 'prefix': 'Итог'}
+print(build_report(*arguments, **options))
+assert values == before
+print('Теги:', collect_tags(' Python ', 'python', ' IT '))
+print('LEGB:', outer(), 'global:', course)
+assert course == 'Основы программирования'
+first = bad_add_result(1)
+second = bad_add_result(2)
+assert first is second and first == [1, 2]
+print('Общий default:', first, second)
+assert add_result(1) == [1] and add_result(2) == [2]
+assert add_result(3, values) == [80, 90, 3] and values == before
+print('Исправлено:', add_result(1), add_result(2))
+print('Именованная функция:', apply_to_results(double, [1, 2, 3]))
+print('lambda:', apply_to_results(lambda x: x + 5, [1, 2, 3]))
+assert apply_to_results(double, [1, 2]) == [2, 4]
+assert apply_to_results(lambda x: x + 5, [1, 2]) == [6, 7]
+check60 = make_threshold_checker(60)
+check90 = make_threshold_checker(90)
+assert check60(75) and not check90(75)
+assert check60(60) and check90(90)
+print('Пороги 60 и 90 для 75:', check60(75), check90(75))
+print('Проверки задания 4 пройдены')
 ```
 
 ### task_5.py
@@ -759,26 +788,6 @@ def student_summary(name, results):
     }
 
 
-def rank(summaries):
-    """Сортируем копию списка сводок по убыванию среднего балла."""
-    result = summaries.copy()
-    # Пузырьковая сортировка: сравниваем соседние записи.
-    for i in range(len(result) - 1):
-        for j in range(len(result) - 1 - i):
-            left = result[j]['mean']
-            right = result[j + 1]['mean']
-            # Студенты без оценок должны попасть в конец.
-            if left is None:
-                left = -1
-            if right is None:
-                right = -1
-            if left < right:
-                temporary = result[j]
-                result[j] = result[j + 1]
-                result[j + 1] = temporary
-    return result
-
-
 def find_top_students(students):
     """Находим всех студентов с самым высоким средним баллом."""
     best = None
@@ -819,13 +828,26 @@ def group_summary(students):
         average = None
     else:
         average = total / count
+    rating = summaries.copy()
+    for i in range(len(rating) - 1):
+        for j in range(len(rating) - 1 - i):
+            left = rating[j]['mean']
+            right = rating[j + 1]['mean']
+            if left is None:
+                left = -1
+            if right is None:
+                right = -1
+            if left < right:
+                temporary = rating[j]
+                rating[j] = rating[j + 1]
+                rating[j + 1] = temporary
     return {
         'student_count': len(students),
         'result_count': count,
         'mean': average,
         'categories': categories,
         'leaders': find_top_students(students),
-        'rating': rank(summaries),
+        'rating': rating,
     }
 
 
@@ -858,72 +880,44 @@ def format_report(student_data, group_data):
     return '\n'.join(lines)
 
 
-def main():
-    original = deepcopy(students)
-    summaries = []
-    for name in students:
-        summaries.append(student_summary(name, students[name]))
-    group = group_summary(students)
-    print(format_report(summaries, group))
-    assert students == original
-    assert group['mean'] == 1032 / 13
-    assert group['leaders'] == ['Дарья']
+original = deepcopy(students)
+summaries = []
+for name in students:
+    summaries.append(student_summary(name, students[name]))
+group = group_summary(students)
+print(format_report(summaries, group))
+assert students == original
+assert group['mean'] == 1032 / 13
+assert group['leaders'] == ['Дарья']
 
-    # Название сценария, данные, ожидаемое среднее, ожидаемые лидеры.
-    boundaries = {
-        '0': [0], '59': [59], '60': [60], '74': [74],
-        '75': [75], '89': [89], '90': [90], '100': [100],
-    }
-    checks = [
-        ('обычная группа', students, 1032 / 13, ['Дарья']),
-        ('один студент', {'А': [80]}, 80, ['А']),
-        ('равные лидеры', {'А': [80, 100], 'Б': [90]}, 90, ['А', 'Б']),
-        ('пустая группа', {}, None, []),
-        ('нет результатов', {'А': [], 'Б': [60]}, 60, ['Б']),
-        ('все без результатов', {'А': []}, None, []),
-        ('границы', boundaries, 547 / 8, ['100']),
-    ]
-    for label, data, expected_mean, expected_leaders in checks:
-        before = deepcopy(data)
-        actual = group_summary(data)
-        assert actual['mean'] == expected_mean
-        assert actual['leaders'] == expected_leaders
-        assert data == before
-        print(label, '=>', actual['mean'], actual['leaders'], 'OK')
+# Еще пять сценариев вместе с обычной группой дают шесть проверок.
+one = group_summary({'А': [80]})
+assert one['mean'] == 80
+print('Один студент:', one['mean'], one['leaders'])
 
-    category_checks = [
-        (0, 'недостаточный'), (59, 'недостаточный'),
-        (60, 'удовлетворительный'), (74, 'удовлетворительный'),
-        (75, 'хороший'), (89, 'хороший'),
-        (90, 'отличный'), (100, 'отличный'),
-    ]
-    for score, expected in category_checks:
-        assert classify(score) == expected
-    assert mean([]) is None
-    assert minimum([]) is None
-    assert maximum([]) is None
-    assert minimum([2, -1, 4]) == -1
-    assert maximum([2, -1, 4]) == 4
-    assert mean([2, 4]) == 3
-    assert student_summary('А', [])['category'] == 'нет данных'
-    names = []
-    for row in group['rating']:
-        names.append(row['name'])
-    assert names == ['Дарья', 'Анна', 'Борис', 'Илья']
-    empty_student_group = group_summary({'А': [], 'Б': [60]})
-    assert empty_student_group['rating'][0]['name'] == 'Б'
-    assert empty_student_group['rating'][1]['name'] == 'А'
-    tied_group = group_summary({'А': [90], 'Б': [90]})
-    assert tied_group['rating'][0]['name'] == 'А'
-    assert tied_group['rating'][1]['name'] == 'Б'
-    empty_report = format_report(
-        [student_summary('А', [])], group_summary({'А': []})
-    )
-    assert 'нет данных' in empty_report
-    print('Проверки задания 5 пройдены')
+tied = group_summary({'А': [80, 100], 'Б': [90]})
+assert tied['leaders'] == ['А', 'Б']
+print('Два лидера:', tied['leaders'])
 
+empty = group_summary({})
+assert empty['mean'] is None
+print('Пустая группа:', empty['mean'], empty['leaders'])
 
-if __name__ == '__main__':
-    main()
+no_results = group_summary({'А': [], 'Б': [60]})
+assert no_results['mean'] == 60
+assert student_summary('А', [])['category'] == 'нет данных'
+print('Студент без оценок:', no_results['mean'], no_results['leaders'])
+
+boundaries = {'0': [0], '59': [59], '60': [60], '74': [74],
+              '75': [75], '89': [89], '90': [90], '100': [100]}
+border_group = group_summary(boundaries)
+assert border_group['mean'] == 547 / 8
+print('Границы:', border_group['mean'], border_group['leaders'])
+for name in boundaries:
+    print(name, classify(boundaries[name][0]))
+
+assert minimum([]) is None
+assert maximum([]) is None
+assert mean([]) is None
 ```
 

@@ -1,66 +1,82 @@
-"""Условия, match и обработка группы записей."""
-LEVELS = ('недостаточный', 'удовлетворительный', 'хороший', 'отличный')
+# Балл, тип работы, пропуски.
+records = [
+    (0, 'exam', 0),
+    (59, 'project', 3),
+    (60, 'practice', 0),
+    (74, 'exam', 3),
+    (75, 'project', 0),
+    (89, 'practice', 3),
+    (90, 'exam', 0),
+    (100, 'project', 3),
+    (90, 'exam', 4),
+    (60, 'practice', 5),
+]
+before = records.copy()
+counts = {'недостаточный': 0, 'удовлетворительный': 0,
+          'хороший': 0, 'отличный': 0}
 
-
-def classify_record(score: int, work_type: str, absences: int) -> tuple[str, str]:
-    """Возвращает уровень и пояснение; ошибка диапазона прекращает классификацию."""
-    if not 0 <= score <= 100:
-        return '', 'Ошибка: результат вне диапазона 0..100'
-    elif not 0 <= absences <= 5:
-        return '', 'Ошибка: пропуски вне диапазона 0..5'
+# Одна запись, десять записей группы и дополнительные проверки.
+checks = [(90, 'exam', 0)]
+checks += records
+checks += [(-1, 'exam', 0), (101, 'exam', 0),
+           (80, 'exam', -1), (80, 'exam', 6),
+           (80, 'other', 0)]
+expected = ['отличный',
+ 'недостаточный',
+ 'недостаточный',
+ 'удовлетворительный',
+ 'удовлетворительный',
+ 'хороший',
+ 'хороший',
+ 'отличный',
+ 'отличный',
+ 'хороший',
+ 'недостаточный',
+ '',
+ '',
+ '',
+ '',
+ 'хороший']
+for i in range(len(checks)):
+    score, work_type, absences = checks[i]
+    print('Данные:', score, work_type, absences)
+    if score < 0 or score > 100:
+        print('Ошибка: балл должен быть от 0 до 100')
+    elif absences < 0 or absences > 5:
+        print('Ошибка: пропуски должны быть от 0 до 5')
     else:
         if score >= 90:
-            index = 3
+            level = 'отличный'
         elif score >= 75:
-            index = 2
+            level = 'хороший'
         elif score >= 60:
-            index = 1
+            level = 'удовлетворительный'
         else:
-            index = 0
-    if absences > 3 and index > 0:
-        index -= 1
-    match work_type:
-        case 'exam':
-            description = 'экзаменационная работа'
-        case 'project':
-            description = 'проектная работа'
-        case 'practice':
-            description = 'практическая работа'
-        case _:
-            description = 'неизвестный тип работы'
-    return LEVELS[index], description
+            level = 'недостаточный'
+        if absences > 3:
+            if level == 'отличный':
+                level = 'хороший'
+            elif level == 'хороший':
+                level = 'удовлетворительный'
+            elif level == 'удовлетворительный':
+                level = 'недостаточный'
+        match work_type:
+            case 'exam':
+                description = 'экзаменационная работа'
+            case 'project':
+                description = 'проектная работа'
+            case 'practice':
+                description = 'практическая работа'
+            case _:
+                description = 'неизвестный тип работы'
+        print(description + '; уровень: ' + level)
+        print('Ожидалось:', expected[i])
+        assert level == expected[i]
+        # В сводку входят только десять записей группы.
+        if 1 <= i <= 10:
+            counts[level] += 1
+print('Сводка:', counts)
+assert counts == {'недостаточный': 3, 'удовлетворительный': 2,
+                  'хороший': 3, 'отличный': 2}
 
-
-def main():
-    cases = [(0, 'exam', 0, LEVELS[0]), (59, 'project', 3, LEVELS[0]),
-             (60, 'practice', 0, LEVELS[1]), (74, 'exam', 3, LEVELS[1]),
-             (75, 'project', 0, LEVELS[2]), (89, 'practice', 3, LEVELS[2]),
-             (90, 'exam', 0, LEVELS[3]), (100, 'project', 3, LEVELS[3]),
-             (90, 'exam', 4, LEVELS[2]), (60, 'practice', 5, LEVELS[0]),
-             (-1, 'exam', 0, ''), (101, 'exam', 0, ''),
-             (80, 'exam', -1, ''), (80, 'exam', 6, ''),
-             (80, 'other', 0, LEVELS[2])]
-    for score, kind, absences, expected in cases:
-        actual, description = classify_record(score, kind, absences)
-        assert actual == expected
-        print((score, kind, absences), 'ожидалось:', expected,
-              'получено:', actual, description)
-    records = []
-    for score, kind, absences, expected in cases[:10]:
-        records.append((score, kind, absences))
-    before = records.copy()
-    counts = {}
-    for level in LEVELS:
-        counts[level] = 0
-    for score, kind, absences in records:
-        level, description = classify_record(score, kind, absences)
-        counts[level] += 1
-        print(score, kind, absences, ':', description, '; уровень', level)
-    assert records == before
-    assert counts == {LEVELS[0]: 3, LEVELS[1]: 2, LEVELS[2]: 3, LEVELS[3]: 2}
-    print('Сводка:', counts)
-    print('Проверки задания 1 пройдены')
-
-
-if __name__ == '__main__':
-    main()
+assert records == before

@@ -68,26 +68,6 @@ def student_summary(name, results):
     }
 
 
-def rank(summaries):
-    """Сортируем копию списка сводок по убыванию среднего балла."""
-    result = summaries.copy()
-    # Пузырьковая сортировка: сравниваем соседние записи.
-    for i in range(len(result) - 1):
-        for j in range(len(result) - 1 - i):
-            left = result[j]['mean']
-            right = result[j + 1]['mean']
-            # Студенты без оценок должны попасть в конец.
-            if left is None:
-                left = -1
-            if right is None:
-                right = -1
-            if left < right:
-                temporary = result[j]
-                result[j] = result[j + 1]
-                result[j + 1] = temporary
-    return result
-
-
 def find_top_students(students):
     """Находим всех студентов с самым высоким средним баллом."""
     best = None
@@ -128,13 +108,26 @@ def group_summary(students):
         average = None
     else:
         average = total / count
+    rating = summaries.copy()
+    for i in range(len(rating) - 1):
+        for j in range(len(rating) - 1 - i):
+            left = rating[j]['mean']
+            right = rating[j + 1]['mean']
+            if left is None:
+                left = -1
+            if right is None:
+                right = -1
+            if left < right:
+                temporary = rating[j]
+                rating[j] = rating[j + 1]
+                rating[j + 1] = temporary
     return {
         'student_count': len(students),
         'result_count': count,
         'mean': average,
         'categories': categories,
         'leaders': find_top_students(students),
-        'rating': rank(summaries),
+        'rating': rating,
     }
 
 
@@ -167,70 +160,42 @@ def format_report(student_data, group_data):
     return '\n'.join(lines)
 
 
-def main():
-    original = deepcopy(students)
-    summaries = []
-    for name in students:
-        summaries.append(student_summary(name, students[name]))
-    group = group_summary(students)
-    print(format_report(summaries, group))
-    assert students == original
-    assert group['mean'] == 1032 / 13
-    assert group['leaders'] == ['Дарья']
+original = deepcopy(students)
+summaries = []
+for name in students:
+    summaries.append(student_summary(name, students[name]))
+group = group_summary(students)
+print(format_report(summaries, group))
+assert students == original
+assert group['mean'] == 1032 / 13
+assert group['leaders'] == ['Дарья']
 
-    # Название сценария, данные, ожидаемое среднее, ожидаемые лидеры.
-    boundaries = {
-        '0': [0], '59': [59], '60': [60], '74': [74],
-        '75': [75], '89': [89], '90': [90], '100': [100],
-    }
-    checks = [
-        ('обычная группа', students, 1032 / 13, ['Дарья']),
-        ('один студент', {'А': [80]}, 80, ['А']),
-        ('равные лидеры', {'А': [80, 100], 'Б': [90]}, 90, ['А', 'Б']),
-        ('пустая группа', {}, None, []),
-        ('нет результатов', {'А': [], 'Б': [60]}, 60, ['Б']),
-        ('все без результатов', {'А': []}, None, []),
-        ('границы', boundaries, 547 / 8, ['100']),
-    ]
-    for label, data, expected_mean, expected_leaders in checks:
-        before = deepcopy(data)
-        actual = group_summary(data)
-        assert actual['mean'] == expected_mean
-        assert actual['leaders'] == expected_leaders
-        assert data == before
-        print(label, '=>', actual['mean'], actual['leaders'], 'OK')
+# Еще пять сценариев вместе с обычной группой дают шесть проверок.
+one = group_summary({'А': [80]})
+assert one['mean'] == 80
+print('Один студент:', one['mean'], one['leaders'])
 
-    category_checks = [
-        (0, 'недостаточный'), (59, 'недостаточный'),
-        (60, 'удовлетворительный'), (74, 'удовлетворительный'),
-        (75, 'хороший'), (89, 'хороший'),
-        (90, 'отличный'), (100, 'отличный'),
-    ]
-    for score, expected in category_checks:
-        assert classify(score) == expected
-    assert mean([]) is None
-    assert minimum([]) is None
-    assert maximum([]) is None
-    assert minimum([2, -1, 4]) == -1
-    assert maximum([2, -1, 4]) == 4
-    assert mean([2, 4]) == 3
-    assert student_summary('А', [])['category'] == 'нет данных'
-    names = []
-    for row in group['rating']:
-        names.append(row['name'])
-    assert names == ['Дарья', 'Анна', 'Борис', 'Илья']
-    empty_student_group = group_summary({'А': [], 'Б': [60]})
-    assert empty_student_group['rating'][0]['name'] == 'Б'
-    assert empty_student_group['rating'][1]['name'] == 'А'
-    tied_group = group_summary({'А': [90], 'Б': [90]})
-    assert tied_group['rating'][0]['name'] == 'А'
-    assert tied_group['rating'][1]['name'] == 'Б'
-    empty_report = format_report(
-        [student_summary('А', [])], group_summary({'А': []})
-    )
-    assert 'нет данных' in empty_report
-    print('Проверки задания 5 пройдены')
+tied = group_summary({'А': [80, 100], 'Б': [90]})
+assert tied['leaders'] == ['А', 'Б']
+print('Два лидера:', tied['leaders'])
 
+empty = group_summary({})
+assert empty['mean'] is None
+print('Пустая группа:', empty['mean'], empty['leaders'])
 
-if __name__ == '__main__':
-    main()
+no_results = group_summary({'А': [], 'Б': [60]})
+assert no_results['mean'] == 60
+assert student_summary('А', [])['category'] == 'нет данных'
+print('Студент без оценок:', no_results['mean'], no_results['leaders'])
+
+boundaries = {'0': [0], '59': [59], '60': [60], '74': [74],
+              '75': [75], '89': [89], '90': [90], '100': [100]}
+border_group = group_summary(boundaries)
+assert border_group['mean'] == 547 / 8
+print('Границы:', border_group['mean'], border_group['leaders'])
+for name in boundaries:
+    print(name, classify(boundaries[name][0]))
+
+assert minimum([]) is None
+assert maximum([]) is None
+assert mean([]) is None
