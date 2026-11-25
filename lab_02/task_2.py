@@ -5,8 +5,8 @@ alias = original
 shallow = original.copy()
 deep = copy.deepcopy(original)
 
-print('Прогноз: append изменит original и alias.')
-print('Замена оценки изменит еще и shallow. deep не изменится.')
+# Прогноз: append изменит original и alias.
+# Замена оценки изменит еще и shallow. deep не изменится.
 
 
 print('До изменений')
@@ -41,7 +41,7 @@ print('id списка, строки, оценки:', id(shallow), id(shallow[0]
 print('deep:', deep)
 print('id списка, строки, оценки:', id(deep), id(deep[0]), id(deep[0][1]))
 
-print('Прогноз: в wrong_matrix изменятся все строки, в correct_matrix — одна.')
+# Прогноз: в wrong_matrix изменятся все строки, в correct_matrix — одна.
 wrong_matrix = [[0] * 3] * 3
 correct_matrix = [[0] * 3 for _ in range(3)]
 wrong_matrix[0][0] = 1

@@ -2,14 +2,14 @@
 from copy import deepcopy
 
 
-print('Прогноз A: сначала один int; после += значения 11 и 10.')
+# Прогноз A: сначала один int; после += значения 11 и 10.
 a = 10
 b = a
 print(a, b, id(a), id(b))
 a += 1
 print(a, b, id(a), id(b))
 assert (a, b) == (11, 10) and a is not b
-print('Прогноз B: append общий; после копирования изменения независимы.')
+# Прогноз B: append общий; после копирования изменения независимы.
 first = [10, 20]
 second = first
 print(first, second, id(first), id(second))
@@ -20,7 +20,7 @@ print('После переназначения: ==', first == second, 'is', firs
 second.append(40)
 print(first, second)
 assert first == [10, 20, 30] and second == [10, 20, 30, 40]
-print('Прогноз: присваивание разделяет весь словарь; deepcopy изолирует списки.')
+# Прогноз: присваивание разделяет весь словарь; deepcopy изолирует списки.
 config = {'name': 'Учебный проект', 'members': ['Анна'],
           'launch': [['--port', '8000'], ['--debug', 'off']]}
 alias = config

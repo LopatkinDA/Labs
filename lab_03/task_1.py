@@ -21,6 +21,7 @@ checks += records
 checks += [(-1, 'exam', 0), (101, 'exam', 0),
            (80, 'exam', -1), (80, 'exam', 6),
            (80, 'other', 0)]
+# Прогноз: ожидаемые уровни для проверок перечислены в expected.
 expected = ['отличный',
  'недостаточный',
  'недостаточный',
@@ -70,7 +71,6 @@ for i in range(len(checks)):
             case _:
                 description = 'неизвестный тип работы'
         print(description + '; уровень: ' + level)
-        print('Ожидалось:', expected[i])
         assert level == expected[i]
         # В сводку входят только десять записей группы.
         if 1 <= i <= 10:

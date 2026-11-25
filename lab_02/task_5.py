@@ -9,7 +9,7 @@ print('Строка 10 символов:', sys.getsizeof('abcdefghij'))
 print('Число:', sys.getsizeof(1000))
 print('None:', sys.getsizeof(None))
 
-print('Прогноз: размер списка растет не после каждого append.')
+# Прогноз: размер списка растет не после каждого append.
 numbers = []
 old_size = sys.getsizeof(numbers)
 print(len(numbers), old_size)
@@ -20,7 +20,7 @@ for number in range(100):
         print(len(numbers), new_size)
         old_size = new_size
 
-print('Прогноз: list(range(100000)) занимает больше памяти, чем range.')
+# Прогноз: list(range(100000)) занимает больше памяти, чем range.
 tracemalloc.start()
 numbers = list(range(100000))
 current, peak = tracemalloc.get_traced_memory()

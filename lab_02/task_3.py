@@ -1,7 +1,7 @@
 import sys
 import weakref
 
-print('Прогноз: счетчик будет 2, 3, 4, 3, 2.')
+# Прогноз: счетчик будет 2, 3, 4, 3, 2.
 data = [1, 2, 3]
 print('После создания:', sys.getrefcount(data))
 alias = data
@@ -17,14 +17,14 @@ print('После clear:', sys.getrefcount(data))
 class Record:
     pass
 
-print('Прогноз: после del record слабая ссылка вернет None.')
+# Прогноз: после del record слабая ссылка вернет None.
 record = Record()
 weak_record = weakref.ref(record)
 print('До удаления:', weak_record())
 del record
 print('После удаления:', weak_record())
 
-print('Прогноз реестра: a, b, c -> a, b -> b.')
+# Прогноз реестра: a, b, c -> a, b -> b.
 a = Record()
 b = Record()
 c = Record()
